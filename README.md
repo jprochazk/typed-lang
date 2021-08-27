@@ -3,8 +3,6 @@
 A toy language
 
 - Simple type system (strong + nominal)
-  - Rust-like structs
-  - Simple trait system
 - Syntax similar to Python (minimalistic, indentation-sensitive)
 - Transpiles to JavaScript (ES6+, compatible with Node.js and modern browsers)
 
