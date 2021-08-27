@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "bungcip.better-toml",
+    "panicbit.cargo",
+    "vadimcn.vscode-lldb",
+    "serayuzgur.crates",
+    "matklad.rust-analyzer"
+  ]
+}
