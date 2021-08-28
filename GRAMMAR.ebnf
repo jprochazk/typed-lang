@@ -1,35 +1,35 @@
 
-# whitespace:
-# - '\n' is lexed as a NEWLINE token
-# - '^\s+' is lexed as an INDENT(Space, N) token
-# - '^\t+' is lexed as an INDENT(Tab, N) token
-#
-# - whenever the parser advances to the next token:
-#   if token == NEWLINE:
-#     indent = match(INDENT)
-#     if indent_style is None: indent_style = indent.style
-#     elif indent.style != indent_style: error("Mixing spaces and tabs")
-#
-#     if indent_stack.top.level != 0 and indent is None: error("Expected indentation")
-#     indent = indent.unwrap()
-#     if indent.level == indent_stack.top.level: return
-#     if block.indent.level === 0 and indent.level != 0: error("Unexpected indentation")
-#     if indent.level > indent_stack.top.level:
-#       return indent_stack.push(indent)
-#     elif indent.level < indent_stack.top.level:
-#       found_matching_indent_level = false
-#       while prev_indent := indent_stack.top and prev_indent.level > block.indent.level:
-#         if indent.level < prev_indent.level: indent_stack.pop()
-#         elif indent.level == prev_indent.level:
-#           found_matching_indent_level = true
-#           break
-#       if not found_matching_indent_level: error("Inconsistent indentation")
+(*  whitespace: *)
+(*  - '\n' is lexed as a NEWLINE token *)
+(*  - '^\s+' is lexed as an INDENT(Space, N) token *)
+(*  - '^\t+' is lexed as an INDENT(Tab, N) token *)
+(*  - whenever the parser advances to the next token: *)
+(*    if token == NEWLINE: *)
+(*      indent = match(INDENT) *)
+(*      if indent_style is None: indent_style = indent.style *)
+(*      elif indent.style != indent_style: error("Mixing spaces and tabs") *)
+(*      if indent_stack.top.level != 0 and indent is None: error("Expected indentation") *)
+(*      indent = indent.unwrap() *)
+(*      if indent.level == indent_stack.top.level: return *)
+(*      if block.indent.level === 0 and indent.level != 0: error("Unexpected indentation") *)
+(*      if indent.level > indent_stack.top.level: *)
+(*        return indent_stack.push(indent) *)
+(*      elif indent.level < indent_stack.top.level: *)
+(*        found_matching_indent_level = false *)
+(*        while prev_indent := indent_stack.top and prev_indent.level > block.indent.level: *)
+(*          if indent.level < prev_indent.level: indent_stack.pop() *)
+(*          elif indent.level == prev_indent.level: *)
+(*            found_matching_indent_level = true *)
+(*            break *)
+(*        if not found_matching_indent_level: error("Inconsistent indentation") *)
 
-# the grammar does not contain indentation rules, but they are:
-# 1. all statements in the same block must have the same indentation level
-# 2. a statement which creates a new scope (such as for/while/if) also increases the indentation level,
-#    which means that statements inside of this scope must have an indentation level higher than the
-#    scope-creating statement
+(*  the grammar does not contain indentation rules, but they are: *)
+(*  1. all statements in the same block must have the same indentation level *)
+(*  2. a statement which creates a new scope (such as for/while/if) also increases the indentation level, *)
+(*     which means that statements inside of this scope must have an indentation level higher than the *)
+(*     scope-creating statement *)
+
+(* TODO: named function args, generics (fn, struct), ADTs (enum), constants (?) *)
 
 program ::= import_list stmt_list ;
 
@@ -72,19 +72,19 @@ var_stmt ::=
 for_stmt ::= 'for' ident 'in' expr ':' stmt ;
 while_stmt ::= 'while' expr ':' stmt ;
 loop_stmt ::= 'loop' ':' stmt ;
-fn_stmt ::= 'fn' ident param_list ':' stmt ;
+fn_stmt ::= 'fn' ident param_list '->' type_expr ':' stmt ;
 param_list ::= '(' ident ':' type_expr ( ',' ident ':' type_expr )* ')' ;
 throw_stmt ::= 'throw' expr ;
 try_stmt ::=
   'try' ':' stmt
-  # if 'catch' is not present, 'finally' is required
+  (*  if 'catch' is not present, 'finally' is required *)
   ( 'catch' ident ':' stmt ) | ( ( 'catch' ident ':' stmt )? 'finally' ':' stmt )
   ;
 pass_stmt ::= 'pass' ;
-# TODO: labels?
+(*  TODO: labels? *)
 continue_stmt ::= 'continue' ;
 break_stmt ::= 'break' ;
-# only allowed in a function
+(*  only allowed in a function *)
 return_stmt ::= 'return' expr? ;
 struct_stmt ::= 'struct' ident ':' ( struct_body | pass_stmt ) ;
 struct_body ::= ( property | fn_stmt | impl )+ ;
@@ -93,7 +93,7 @@ impl ::= 'impl' ident ( ':' fn_stmt+ )? ;
 trait_stmt ::= 'trait' ident ( ':' fn_stmt+ )? ;
 type_stmt ::= 'type' ident '=' type_expr ;
 
-type_expr ::= primary_type_expr ( '&' primary_type_expr )*
+type_expr ::= primary_type_expr ( '+' primary_type_expr )*
 primary_type_expr ::= ident ;
 
 expr_stmt ::= comma_expr ;
@@ -102,7 +102,7 @@ expr ::=
   | anonymous_fn_expr
   | assignment_expr
   ;
-# anonymous functions dont have param types
+(*  anonymous functions dont have param types *)
 anonymous_fn_expr ::=
   | 'fn' ident ':' stmt
   | 'fn' '(' ident ( ',' ident )* ')' ':' stmt
@@ -128,13 +128,13 @@ assignment_op ::=
   | '^='
   | '~='
   ;
-# can only assign in the following ways
+(*  can only assign in the following ways *)
 assignment_target ::=
-  # identifier = expression
+  (*  identifier = expression *)
   | ident
-  # some().access = expression
+  (*  some().access = expression *)
   | call_expr '.' ident
-  # some()[index] = expression
+  (*  some()[index] = expression *)
   | call_expr '[' expr ']'
   ;
 logic_or_expr ::= logic_and_expr ( ( '||' | 'or') logic_and_expr )* ;
@@ -169,17 +169,17 @@ group_expr ::= '(' comma_expr ')' ;
 
 none_literal ::= 'none' ;
 boolean_literal ::= 'true' | 'false' ;
-# integers may use underscores, e.g. 100_000
+(*  integers may use underscores, e.g. 100_000 *)
 integer_literal ::= REGEX{'[0-9]([0-9_]*[0-9])?'} ;
 float_literal ::=
-  # IEEE 754 floating point literal
-  # examples: "1.0", "1e-5", "123.123E+5"
+  (*  IEEE 754 floating point literal *)
+  (*  examples: "1.0", "1e-5", "123.123E+5" *)
   | REGEX{'[0-9]+[Ee][+-]?[0-9]+|([0-9]+\\.[0-9]+([Ee][+-]?[0-9]+)?)'}
   | 'NaN'
   | 'inf'
   ;
 string_literal ::=
-  # strings must be valid utf-8
+  (*  strings must be valid utf-8 *)
   | REGEX{'\"([^\"\\\\]|\\\\.)*\"'}
   | REGEX{'\'([^\'\\\\]|\\\\.)*\''}
   ;
