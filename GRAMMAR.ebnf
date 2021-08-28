@@ -75,9 +75,9 @@ loop_stmt ::= 'loop' ':' stmt ;
 fn_stmt ::= 'fn' ident param_list '->' type_expr ':' stmt ;
 param_list ::= '(' ident ':' type_expr ( ',' ident ':' type_expr )* ')' ;
 throw_stmt ::= 'throw' expr ;
+(*  if 'catch' is not present, 'finally' is required *)
 try_stmt ::=
   'try' ':' stmt
-  (*  if 'catch' is not present, 'finally' is required *)
   ( 'catch' ident ':' stmt ) | ( ( 'catch' ident ':' stmt )? 'finally' ':' stmt )
   ;
 pass_stmt ::= 'pass' ;
@@ -129,12 +129,12 @@ assignment_op ::=
   | '~='
   ;
 (*  can only assign in the following ways *)
+(*  identifier = expression *)
+(*  some().access = expression *)
+(*  some()[index] = expression *)
 assignment_target ::=
-  (*  identifier = expression *)
   | ident
-  (*  some().access = expression *)
   | call_expr '.' ident
-  (*  some()[index] = expression *)
   | call_expr '[' expr ']'
   ;
 logic_or_expr ::= logic_and_expr ( ( '||' | 'or') logic_and_expr )* ;
@@ -171,15 +171,15 @@ none_literal ::= 'none' ;
 boolean_literal ::= 'true' | 'false' ;
 (*  integers may use underscores, e.g. 100_000 *)
 integer_literal ::= REGEX{'[0-9]([0-9_]*[0-9])?'} ;
+(*  IEEE 754 floating point literal *)
+(*  examples: "1.0", "1e-5", "123.123E+5" *)
 float_literal ::=
-  (*  IEEE 754 floating point literal *)
-  (*  examples: "1.0", "1e-5", "123.123E+5" *)
   | REGEX{'[0-9]+[Ee][+-]?[0-9]+|([0-9]+\\.[0-9]+([Ee][+-]?[0-9]+)?)'}
   | 'NaN'
   | 'inf'
   ;
+(*  strings must be valid utf-8 *)
 string_literal ::=
-  (*  strings must be valid utf-8 *)
   | REGEX{'\"([^\"\\\\]|\\\\.)*\"'}
   | REGEX{'\'([^\'\\\\]|\\\\.)*\''}
   ;
