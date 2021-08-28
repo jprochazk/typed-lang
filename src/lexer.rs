@@ -137,6 +137,8 @@ pub enum TokenKind /* <'source> */ {
   BitOrEqual,
   #[token("^=")]
   BitXorEqual,
+  #[token("->")]
+  Arrow,
   #[token("(")]
   LeftParen,
   #[token(")")]
@@ -344,7 +346,7 @@ mod tests {
     { "a >>= b", ["a", ">>=", "b"] }
   ]);
 
-  text_lexemes!(misc { ": , ;", [":", ",", ";"] });
+  text_lexemes!(misc { ": , ; ->", [":", ",", ";", "->"] });
 
   text_lexemes!(identifiers [
     { "asdf", ["asdf"] }
@@ -413,6 +415,23 @@ mod tests {
     "
     fn test():
     
+      pass
+    ",
+    [
+      t!(Fn),
+      t!(Identifier, "test"),
+      t!(LeftParen),
+      t!(RightParen),
+      t!(Colon),
+      t!(Indent, "\n  "),
+      t!(Pass)
+    ]
+  });
+
+  test_tokens!(comments {
+    "
+    # test
+    fn test(): # test
       pass
     ",
     [
