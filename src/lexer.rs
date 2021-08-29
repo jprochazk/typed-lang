@@ -52,6 +52,8 @@ pub enum TokenKind /* <'source> */ {
   Impl,
   #[token("trait")]
   Trait,
+  #[token("enum")]
+  Enum,
   #[token("type")]
   Type,
   #[token("is")]
@@ -346,7 +348,7 @@ mod tests {
     { "a >>= b", ["a", ">>=", "b"] }
   ]);
 
-  text_lexemes!(misc { ": , ; ->", [":", ",", ";", "->"] });
+  text_lexemes!(misc { ": , ; -> .", [":", ",", ";", "->", "."] });
 
   text_lexemes!(identifiers [
     { "asdf", ["asdf"] }
@@ -369,8 +371,8 @@ mod tests {
   ]);
 
   text_lexemes!(keywords {
-    "import as from if elif else for in while loop fn throw try catch finally pass continue break return struct impl trait type and or not is none true false",
-    ["import", "as", "from", "if", "elif", "else", "for", "in", "while", "loop", "fn", "throw", "try", "catch", "finally", "pass", "continue", "break", "return", "struct", "impl", "trait", "type", "and", "or", "not", "is", "none", "true", "false"]
+    "import as from if elif else for in while loop fn throw try catch finally pass continue break return struct impl trait enum type and or not is none true false",
+    ["import", "as", "from", "if", "elif", "else", "for", "in", "while", "loop", "fn", "throw", "try", "catch", "finally", "pass", "continue", "break", "return", "struct", "impl", "trait", "enum", "type", "and", "or", "not", "is", "none", "true", "false"]
   });
 
   text_lexemes!(comment {
